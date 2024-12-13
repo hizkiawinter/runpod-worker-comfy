@@ -49,7 +49,7 @@ RUN chmod +x /start.sh /restore_snapshot.sh
 ADD *snapshot*.json /
 
 # Restore the snapshot to install custom nodes
-RUN /restore_snapshot.sh
+RUN restore_snapshot.sh
 
 # Start container
 CMD ["/start.sh"]
