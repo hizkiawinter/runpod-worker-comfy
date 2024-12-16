@@ -52,6 +52,7 @@ ADD *snapshot*.json /
 RUN sed -i 's/\r//' /restore_snapshot.sh
 RUN /restore_snapshot.sh 
 
+RUN sed -i 's/\r//' /start.sh 
 # Start container
 CMD ["/start.sh"]
 
@@ -65,13 +66,14 @@ ARG MODEL_TYPE
 WORKDIR /comfyui
 
 # Create necessary directories
-RUN mkdir -p models/checkpoints models/vae models/controlnet 
+RUN mkdir -p models/checkpoints models/vae models/controlnet models/animatediff_models
 
 # Download checkpoints/vae/LoRA to include in image based on model type
 RUN if [ "$MODEL_TYPE" = "sdxl" ]; then \
       wget -O models/checkpoints/counterfeitxl_v25.safetensors "https://civitai.com/api/download/models/265012?type=Model&format=SafeTensor&size=pruned&fp=fp16" && \
       wget -O models/vae/sdxl_vae.safetensors https://huggingface.co/stabilityai/sdxl-vae/resolve/main/sdxl_vae.safetensors && \
-      wget -O models/controlnet/t2i-adapter_diffusers_xl_depth_midas.safetensors https://huggingface.co/lllyasviel/sd_control_collection/resolve/main/t2i-adapter_diffusers_xl_depth_midas.safetensors \
+      wget -O models/animatediff_models/hsxl_temporal_layers.safetensors https://huggingface.co/hotshotco/Hotshot-XL/resolve/main/hsxl_temporal_layers.safetensors && \
+      wget -O models/controlnet/t2i-adapter_diffusers_xl_depth_midas.safetensors https://huggingface.co/lllyasviel/sd_control_collection/resolve/main/t2i-adapter_diffusers_xl_depth_midas.safetensors; \
     elif [ "$MODEL_TYPE" = "sd3" ]; then \
       wget --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/checkpoints/sd3_medium_incl_clips_t5xxlfp8.safetensors https://huggingface.co/stabilityai/stable-diffusion-3-medium/resolve/main/sd3_medium_incl_clips_t5xxlfp8.safetensors; \
     elif [ "$MODEL_TYPE" = "flux1-schnell" ]; then \
@@ -86,14 +88,12 @@ RUN if [ "$MODEL_TYPE" = "sdxl" ]; then \
       wget --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/vae/ae.safetensors https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors; \
     fi
 
-WORKDIR /comfyui/custom_nodes
-RUN wget -O ComfyUI-AnimateDiff-Evolved/models/hsxl_temporal_layers.safetensors https://huggingface.co/hotshotco/Hotshot-XL/resolve/main/hsxl_temporal_layers.safetensors
-
-# Stage 3: Final image
+# Stage 3: Final image  
 FROM base as final
 
 # Copy models from stage 2 to the final image
 COPY --from=downloader /comfyui/models /comfyui/models
 
+RUN sed -i 's/\r//' /start.sh 
 # Start container
 CMD ["/start.sh"]
