@@ -232,7 +232,7 @@ def process_output_images(outputs, job_id):
     # The path where ComfyUI stores the generated images
     COMFY_OUTPUT_PATH = os.environ.get("COMFY_OUTPUT_PATH", "/comfyui/output")
 
-    output_images = {}
+    output_images = []
 
     for node_id, node_output in outputs.items():
         if "images" in node_output:
@@ -257,13 +257,14 @@ def process_output_images(outputs, job_id):
         else:
             # base64 image
             image = base64_encode(local_image_path)
+            output_images.append(image)
             print(
                 "runpod-worker-comfy - the image was generated and converted to base64"
             )
 
         return {
             "status": "success",
-            "message": image,
+            "message": output_images,   
         }
     else:
         print("runpod-worker-comfy - the image does not exist in the output folder")
