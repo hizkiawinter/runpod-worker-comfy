@@ -76,6 +76,9 @@ RUN wget -O models/checkpoints/counterfeitxl_v25.safetensors "https://civitai.co
     wget -O models/controlnet/t2i-adapter_diffusers_xl_depth_midas.safetensors https://huggingface.co/lllyasviel/sd_control_collection/resolve/main/t2i-adapter_diffusers_xl_depth_midas.safetensors
 
 
+WORKDIR /comfyui/custom_nodes/ComfyS3
+ADD .env /
+
 # Stage 3: Final image  
 FROM base as final
 
