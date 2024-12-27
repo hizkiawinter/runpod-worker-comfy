@@ -63,6 +63,9 @@ FROM base as downloader
 ARG HUGGINGFACE_ACCESS_TOKEN
 ARG MODEL_TYPE
 
+WORKDIR /comfyui/custom_nodes/ComfyS3
+ADD .env /
+
 # Change working directory to ComfyUI
 WORKDIR /comfyui
 
@@ -75,9 +78,6 @@ RUN wget -O models/checkpoints/counterfeitxl_v25.safetensors "https://civitai.co
     wget -O models/animatediff_models/hsxl_temporal_layers.safetensors https://huggingface.co/hotshotco/Hotshot-XL/resolve/main/hsxl_temporal_layers.safetensors && \
     wget -O models/controlnet/t2i-adapter_diffusers_xl_depth_midas.safetensors https://huggingface.co/lllyasviel/sd_control_collection/resolve/main/t2i-adapter_diffusers_xl_depth_midas.safetensors
 
-
-WORKDIR /comfyui/custom_nodes/ComfyS3
-ADD .env /
 
 # Stage 3: Final image  
 FROM base as final
