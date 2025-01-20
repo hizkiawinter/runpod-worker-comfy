@@ -1,10 +1,6 @@
 {
     "comfyui": "9a0a5d32ee49e79beae551fe2a165ac1108378e9",
     "git_custom_nodes": {
-        "https://github.com/TemryL/ComfyS3": {
-            "hash": "1efc620180676cdc122957b4a3afbc5ae176f324",
-            "disabled": false
-        },
         "https://github.com/WASasquatch/was-node-suite-comfyui": {
             "hash": "056badacda52e88d29d6a65f9509cd3115ace0f2",
             "disabled": false
