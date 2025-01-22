@@ -53,6 +53,11 @@ ADD *snapshot*.json /
 RUN sed -i 's/\r//' /restore_snapshot.sh
 RUN /restore_snapshot.sh 
 
+WORKDIR /comfyui/custom_nodes 
+RUN git clone https://github.com/hizkiawinter/ComfyS3.git
+
+WORKDIR / 
+
 RUN sed -i 's/\r//' /start.sh 
 # Start container
 CMD ["/start.sh"]
@@ -62,9 +67,6 @@ FROM base as downloader
 
 ARG HUGGINGFACE_ACCESS_TOKEN
 ARG MODEL_TYPE
-
-WORKDIR /comfyui/custom_nodes/ComfyS3
-ADD .env /
 
 # Change working directory to ComfyUI
 WORKDIR /comfyui
