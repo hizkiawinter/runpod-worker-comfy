@@ -14,9 +14,9 @@ COMFY_API_AVAILABLE_INTERVAL_MS = 50
 # Maximum number of API check attempts
 COMFY_API_AVAILABLE_MAX_RETRIES = 500
 # Time to wait between poll attempts in milliseconds
-COMFY_POLLING_INTERVAL_MS = int(os.environ.get("COMFY_POLLING_INTERVAL_MS", 250))
+COMFY_POLLING_INTERVAL_MS = int(os.environ.get("COMFY_POLLING_INTERVAL_MS", 3000))
 # Maximum number of poll attempts
-COMFY_POLLING_MAX_RETRIES = int(os.environ.get("COMFY_POLLING_MAX_RETRIES", 500))
+COMFY_POLLING_MAX_RETRIES = int(os.environ.get("COMFY_POLLING_MAX_RETRIES", 1200))
 # Host where ComfyUI is running
 COMFY_HOST = "127.0.0.1:8188"
 # Enforce a clean state after each job is done
@@ -236,7 +236,7 @@ def process_output_images(outputs, job_id):
 
     for node_id, node_output in outputs.items():
         if "images" in node_output:
-            for image in node_output["images"]:
+            for image in node_output["images"]: 
                 output_images = os.path.join(image["subfolder"], image["filename"])
 
     print(f"runpod-worker-comfy - image generation is done")
@@ -311,7 +311,7 @@ def handler(job):
     if upload_result["status"] == "error":
         return upload_result
 
-    # Queue the workflow
+    
     try:
         queued_workflow = queue_workflow(workflow)
         prompt_id = queued_workflow["prompt_id"]
@@ -319,18 +319,18 @@ def handler(job):
     except Exception as e:
         return {"error": f"Error queuing workflow: {str(e)}"}
 
-    # Poll for completion
+  
     print(f"runpod-worker-comfy - wait until image generation is complete")
     retries = 0
     try:
         while retries < COMFY_POLLING_MAX_RETRIES:
             history = get_history(prompt_id)
 
-            # Exit the loop if we have found the history
+           
             if prompt_id in history and history[prompt_id].get("outputs"):
                 break
             else:
-                # Wait before trying again
+               
                 time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
                 retries += 1
         else:
@@ -338,7 +338,7 @@ def handler(job):
     except Exception as e:
         return {"error": f"Error waiting for image generation: {str(e)}"}
 
-    # Get the generated image and return it as URL in an AWS bucket or as base64
+  
     images_result = process_output_images(history[prompt_id].get("outputs"), job["id"])
 
     result = {**images_result, "refresh_worker": REFRESH_WORKER}
@@ -346,6 +346,6 @@ def handler(job):
     return result
 
 
-# Start the handler only if this script is run directly
+
 if __name__ == "__main__":
     runpod.serverless.start({"handler": handler})
